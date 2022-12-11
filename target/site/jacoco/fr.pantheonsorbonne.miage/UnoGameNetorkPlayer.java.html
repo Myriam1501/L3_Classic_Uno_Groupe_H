@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UnoGameNetorkPlayer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">l3-poo-war</a> &gt; <a href="index.source.html" class="el_package">fr.pantheonsorbonne.miage</a> &gt; <span class="el_source">UnoGameNetorkPlayer.java</span></div><h1>UnoGameNetorkPlayer.java</h1><pre class="source lang-java linenums">package fr.pantheonsorbonne.miage;
+
+import fr.pantheonsorbonne.miage.exception.NoMoreCardException;
+import fr.pantheonsorbonne.miage.game.Card;
+
+import fr.pantheonsorbonne.miage.model.Game;
+import fr.pantheonsorbonne.miage.model.GameCommand;
+
+
+import java.util.stream.Collectors;
+
+
+/**
+ * this is the player part of the network version of the war game
+ */
+<span class="nc" id="L16">public class UnoGameNetorkPlayer extends UnoGamePlayer{</span>
+<span class="nc" id="L17">    static final PlayerFacade playerFacade = Facade.getFacade();</span>
+    static Game uno;
+
+    public static void main(String[] args) throws NoMoreCardException {
+
+<span class="nc" id="L22">        playerFacade.waitReady();</span>
+<span class="nc" id="L23">        playerFacade.createNewPlayer(playerId);</span>
+<span class="nc" id="L24">        uno = playerFacade.autoJoinGame(&quot;uno&quot;);</span>
+        while (true) {
+
+<span class="nc" id="L27">            GameCommand command = playerFacade.receiveGameCommand(uno);</span>
+<span class="nc bnc" id="L28" title="All 9 branches missed.">            switch (command.name()) {</span>
+                case &quot;cardsForYou&quot;:
+<span class="nc" id="L30">                    handleCardsForYou(command);</span>
+<span class="nc" id="L31">                    break;</span>
+                case &quot;playACard&quot;:
+<span class="nc" id="L33">                    System.out.println(&quot;I have &quot; + hand.stream().map(Card::toString).collect(Collectors.joining(&quot; &quot;)));</span>
+<span class="nc" id="L34">                    handlePlayACard(command);</span>
+<span class="nc" id="L35">                    break;</span>
+                case &quot;gameOver&quot;:
+<span class="nc" id="L37">                    handleGameOverCommand(command);</span>
+<span class="nc" id="L38">                    break;</span>
+                case &quot;scoreForYou&quot;:
+<span class="nc" id="L40">                    handleScoreForYou(command);</span>
+<span class="nc" id="L41">                    break;</span>
+                case &quot;doYouHaveCards&quot;:
+<span class="nc" id="L43">                    handleNoCardCommand(command);</span>
+<span class="nc" id="L44">                    break;</span>
+                case &quot;removeYourHand&quot;:
+<span class="nc" id="L46">                    handleARemove(command);</span>
+<span class="nc" id="L47">                    break;</span>
+                case &quot;whatIsYourScore&quot;:
+<span class="nc" id="L49">                    handOutOfScore(command);</span>
+<span class="nc" id="L50">                    break;</span>
+                case &quot;yourLostHandScore&quot;:
+<span class="nc" id="L52">                    handScoreToWinner(command);</span>
+                    break;
+            }
+<span class="nc" id="L55">        }</span>
+    }
+
+    private static void handScoreToWinner(GameCommand command) {
+<span class="nc" id="L59">        System.out.println(&quot;Cards left from the Round :\n&quot;+hand);</span>
+<span class="nc" id="L60">        int myPointsforTheWinner = 0;</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        for(Card card:hand){</span>
+<span class="nc" id="L62">            myPointsforTheWinner += card.getValue().getRank();</span>
+<span class="nc" id="L63">        }</span>
+<span class="nc" id="L64">        System.out.println(&quot;I give &quot;+myPointsforTheWinner+&quot; points to the winner&quot;);</span>
+<span class="nc" id="L65">        playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;myLostHandScore&quot;, Integer.toString(myPointsforTheWinner)));</span>
+<span class="nc" id="L66">    }</span>
+
+    private static void handOutOfScore(GameCommand command) {
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if(score&gt;=20){</span>
+<span class="nc" id="L70">            playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;outOfScore&quot;));</span>
+        }
+        else{
+<span class="nc" id="L73">            playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;no :-(&quot;));</span>
+        }
+<span class="nc" id="L75">    }</span>
+
+    private static void handleScoreForYou(GameCommand command) {
+<span class="nc" id="L78">        int pointsWinningOfTheRound = Integer.parseInt(command.body());</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (command.params().get(&quot;playerId&quot;).equals(playerId)) {</span>
+<span class="nc" id="L80">            score+=pointsWinningOfTheRound;</span>
+        }
+<span class="nc" id="L82">        System.out.println(playerId+&quot; win and have &quot;+ score +&quot;points now&quot;);</span>
+<span class="nc" id="L83">        playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;newScore&quot;));</span>
+        
+<span class="nc" id="L85">    }</span>
+
+    private static void handleNoCardCommand(GameCommand command){
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (command.params().get(&quot;playerId&quot;).equals(playerId)) {</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            if (!hand.isEmpty()) {</span>
+<span class="nc" id="L90">                playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;no&quot;,  hand.toString()));</span>
+            } else {
+<span class="nc" id="L92">                playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;outOfCard&quot;));</span>
+            }
+        }
+
+<span class="nc" id="L96">    } </span>
+
+    private static void handleCardsForYou(GameCommand command) {
+
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        for (Card card : Card.stringToCards(command.body())) {</span>
+<span class="nc" id="L101">            hand.add(card);</span>
+        }
+
+<span class="nc" id="L104">    }</span>
+    private static void handleARemove(GameCommand command){
+<span class="nc" id="L106">        hand.removeAll(hand);</span>
+<span class="nc" id="L107">        playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;fin&quot;));</span>
+
+<span class="nc" id="L109">    }</span>
+
+    private static void handlePlayACard(GameCommand command) {
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (command.params().get(&quot;playerId&quot;).equals(playerId)) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (!hand.isEmpty()) {</span>
+<span class="nc" id="L114">                Card lastCardTalon = Card.valueOf(command.body());</span>
+<span class="nc" id="L115">                System.out.println(&quot;\n&quot;);</span>
+<span class="nc" id="L116">                System.out.println(&quot;Last card in Discard : &quot;+ lastCardTalon);</span>
+<span class="nc" id="L117">                Card CardToPlay = playThisCard(hand,lastCardTalon);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">                if(CardToPlay!=null){</span>
+<span class="nc" id="L119">                    System.out.println(&quot;\n&quot;);</span>
+<span class="nc" id="L120">                    System.out.println(&quot;Card playing : &quot;+CardToPlay.toString());</span>
+<span class="nc" id="L121">                    playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;card&quot;, CardToPlay.toString()));</span>
+                }
+                else{
+<span class="nc" id="L124">                    playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;IdrawenACard&quot;));</span>
+<span class="nc" id="L125">                    GameCommand expectedDrawenCard = playerFacade.receiveGameCommand(uno);</span>
+<span class="nc" id="L126">                    System.out.println(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">                    if(expectedDrawenCard.name().equals(&quot;drawACard&quot;)){</span>
+<span class="nc" id="L128">                        hand.add( Card.valueOf(expectedDrawenCard.body()));</span>
+<span class="nc" id="L129">                        Card cardToPlayAfterDrawACard = playThisCard(hand,lastCardTalon);</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">                        if(cardToPlayAfterDrawACard!=null){</span>
+<span class="nc" id="L131">                            System.out.println(&quot;\n&quot;);</span>
+<span class="nc" id="L132">                            System.out.println(&quot;Good pick : &quot;+cardToPlayAfterDrawACard.toString());</span>
+<span class="nc" id="L133">                            hand.remove(Card.valueOf(expectedDrawenCard.body()));</span>
+<span class="nc" id="L134">                            playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;luckyCard&quot;, cardToPlayAfterDrawACard.toString()));</span>
+                        }
+                        else{
+<span class="nc" id="L137">                            System.out.println(&quot;\n&quot;);</span>
+<span class="nc" id="L138">                            System.out.println(&quot;Bad pick ! &quot;);</span>
+<span class="nc" id="L139">                            playerFacade.sendGameCommandToAll(uno, new GameCommand(&quot;Unlucky&quot;));</span>
+                        }
+                    }
+
+                    
+
+                }
+                
+            } 
+        }
+<span class="nc" id="L149">    }</span>
+
+    private static void handleGameOverCommand(GameCommand command) {
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (score&gt;=50) {</span>
+<span class="nc" id="L153">            System.out.println(&quot;\n\n\n\n&quot;);</span>
+<span class="nc" id="L154">            System.out.println(&quot;I've won! I have a total of &quot; + score);</span>
+        } else {
+<span class="nc" id="L156">            System.out.println(&quot;\n\n\n\n&quot;);</span>
+<span class="nc" id="L157">            System.out.println(&quot;I've lost :-(&quot;);</span>
+           
+        }
+<span class="nc" id="L160">        System.exit(0);</span>
+<span class="nc" id="L161">    }</span>
+    
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

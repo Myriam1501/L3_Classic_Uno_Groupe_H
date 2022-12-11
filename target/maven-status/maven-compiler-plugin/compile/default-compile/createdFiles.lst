@@ -1,0 +1,13 @@
+fr/pantheonsorbonne/miage/game/Discard.class
+fr/pantheonsorbonne/miage/utils/ConsoleColors.class
+fr/pantheonsorbonne/miage/game/Card.class
+fr/pantheonsorbonne/miage/LocalGameUno.class
+fr/pantheonsorbonne/miage/UnoGameEngine.class
+fr/pantheonsorbonne/miage/enums/CardColor.class
+fr/pantheonsorbonne/miage/UnoGameNetworkEngine.class
+fr/pantheonsorbonne/miage/enums/CardValue.class
+fr/pantheonsorbonne/miage/UnoGamePlayer.class
+fr/pantheonsorbonne/miage/UnoGameNetorkPlayer.class
+fr/pantheonsorbonne/miage/UnoGameEngine$1.class
+fr/pantheonsorbonne/miage/exception/NoMoreCardException.class
+fr/pantheonsorbonne/miage/game/Deck.class

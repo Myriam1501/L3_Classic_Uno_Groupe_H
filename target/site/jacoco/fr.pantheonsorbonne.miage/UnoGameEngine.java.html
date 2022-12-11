@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UnoGameEngine.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">l3-poo-war</a> &gt; <a href="index.source.html" class="el_package">fr.pantheonsorbonne.miage</a> &gt; <span class="el_source">UnoGameEngine.java</span></div><h1>UnoGameEngine.java</h1><pre class="source lang-java linenums">package fr.pantheonsorbonne.miage;
+import fr.pantheonsorbonne.miage.enums.CardColor;
+import fr.pantheonsorbonne.miage.enums.CardValue;
+import fr.pantheonsorbonne.miage.game.Card;
+import fr.pantheonsorbonne.miage.game.Deck;
+import fr.pantheonsorbonne.miage.game.Discard;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.Deque;
+import java.util.Set;
+
+
+
+/**
+ * this class is a abstract version of the engine, to be used locally on through the network
+ */
+<span class="fc" id="L19">public abstract class UnoGameEngine {</span>
+
+    public static final int CARDS_IN_HAND_INITIAL_COUNT = 7;
+<span class="fc" id="L22">    public static String sens = &quot;sens&quot;;</span>
+
+    /**
+     * play a war game wit the provided players
+     */
+    public void play() {
+        //send the initial hand to every players
+<span class="nc bnc" id="L29" title="All 2 branches missed.">        for (String playerName : getInitialPlayers()) {</span>
+            //get random cards
+<span class="nc" id="L31">            Card[] cards = Deck.getCardsIni(CARDS_IN_HAND_INITIAL_COUNT);</span>
+            // transform them to String
+<span class="nc" id="L33">            String hand = Card.cardsToString(cards);</span>
+            //send them to this players
+<span class="nc" id="L35">            giveCardsToPlayer(playerName, hand);</span>
+            
+<span class="nc" id="L37">        } </span>
+        // make a Deque with all the players
+<span class="nc" id="L39">        final Deque&lt;String&gt; players = new LinkedList&lt;&gt;();</span>
+<span class="nc" id="L40">        players.addAll(this.getInitialPlayers());</span>
+        //repeat until only 1 player is left
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        while(checkScoreToWin()==false){</span>
+<span class="nc" id="L43">            Card cardToInitDiscard = Deck.getACard();</span>
+            
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            while(cardToInitDiscard.getColor() == CardColor.WHITE){</span>
+<span class="nc" id="L46">                Deck.deck.offerLast(cardToInitDiscard);</span>
+<span class="nc" id="L47">                cardToInitDiscard = Deck.getACard();</span>
+<span class="nc" id="L48">                System.out.println(&quot;carte white boucle : &quot;+cardToInitDiscard);</span>
+            }
+
+<span class="nc" id="L51">            Discard.getACardToDicard(cardToInitDiscard);</span>
+<span class="nc" id="L52">            System.out.println(&quot;premier carte initial du talon : &quot;+Discard.discard.getLast());</span>
+<span class="nc" id="L53">            int i=0;</span>
+<span class="nc" id="L54">                String winner = null;</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">                while(winner==null){</span>
+                    //these are the cards played by the players on this round
+<span class="nc" id="L57">                    reinitDeckFromDiscard();</span>
+                    //loop until there is a winner for this round
+<span class="nc" id="L59">                    i++;</span>
+<span class="nc" id="L60">                    System.out.println(&quot;round &quot;+i);</span>
+<span class="nc" id="L61">                    Card LastCardOnDisCard = Discard.getLastCardOnDisCard();</span>
+<span class="nc" id="L62">                    winner = playRound(players, LastCardOnDisCard);</span>
+<span class="nc" id="L63">                    System.out.println(&quot;winner = &quot;+winner);</span>
+                    
+<span class="nc" id="L65">                }</span>
+<span class="nc" id="L66">            System.out.println(&quot;players on the round : &quot;+players);</span>
+<span class="nc" id="L67">            reinitDeckFromDiscard();</span>
+<span class="nc" id="L68">            giveScoreToPlayer(winner);</span>
+<span class="nc" id="L69">            players.offer(winner);</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            if(checkScoreToWin()==false){</span>
+<span class="nc bnc" id="L71" title="All 2 branches missed.">                for (String playerName : players) {</span>
+<span class="nc" id="L72">                        reinitDeckFromDiscard();</span>
+                        //get random cards
+<span class="nc" id="L74">                        Card[] cards = Deck.getCardsIni(CARDS_IN_HAND_INITIAL_COUNT);</span>
+                        // transform them to String
+<span class="nc" id="L76">                        String hand = Card.cardsToString(cards);</span>
+<span class="nc" id="L77">                        reinitDeckFromDiscard();</span>
+                        //send them to this players
+<span class="nc" id="L79">                        giveCardsToPlayer(playerName, hand);</span>
+<span class="nc" id="L80">                    }</span>
+                }
+<span class="nc" id="L82">        }</span>
+        //since we've left the loop, we have only 2 players left: losers
+<span class="nc" id="L84">        String winner = players.pollLast();</span>
+        
+        //send him the gameover and leave
+<span class="nc" id="L87">        declareWinner(winner,players);</span>
+<span class="nc" id="L88">        System.out.println(winner + &quot; won! bye&quot;);</span>
+<span class="nc" id="L89">        System.exit(0);</span>
+
+<span class="nc" id="L91">    }</span>
+
+   /**
+     * provide the list of the initial players to play the game
+     * @return
+     */
+    protected abstract Set&lt;String&gt; getInitialPlayers();
+
+      /**
+     * give some card to a player
+     *
+     * @param playerName the player that will receive the cards
+     * @param hand       the cards as a string (to be converted later)
+     */
+    protected abstract void giveCardsToPlayer(String hand, String playerName);
+
+    /**
+     * calculate the sum of score of the cards in hand of two losers
+     * give these score to winner
+     * @param winner
+     */
+    protected abstract void giveScoreToPlayer(String winner);
+
+     /**
+     * We check the score of each player, if the score is more than 100 points, this player wins.
+     * we return true, else we return false.
+     * @return
+     */
+    protected abstract boolean checkScoreToWin();
+    
+    /**
+     * Play a single round
+     * @param players               the Deque containing the remaining players
+     * @param LastCardOnDisCard     the last card in the Discard 
+     * @return
+     */
+    protected String playRound(Deque&lt;String&gt; players, Card LastCardOnDisCard) {
+<span class="fc" id="L128">        String firstPlayerInRound = sensOfRound(players);</span>
+<span class="fc" id="L129">        System.out.println(&quot;\n&quot;);</span>
+<span class="fc" id="L130">        System.out.println(&quot;Player Playing : &quot;+firstPlayerInRound);</span>
+        
+        //here, we try to get the first player card
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if(getCardOrGameOver(firstPlayerInRound)){</span>
+<span class="fc" id="L134">            String winnerOfTheRound = firstPlayerInRound;</span>
+<span class="fc" id="L135">            players.remove(winnerOfTheRound);</span>
+<span class="fc" id="L136">            return winnerOfTheRound;</span>
+            
+        }
+        else{
+<span class="fc" id="L140">            Card firstPlayerCard = getCardToPlay(firstPlayerInRound);</span>
+<span class="fc" id="L141">            System.out.println(&quot;last card :  &quot;+Discard.discard.getLast());</span>
+<span class="fc" id="L142">            System.out.println(&quot;\n&quot;);</span>
+<span class="fc" id="L143">            System.out.println(firstPlayerInRound+&quot; play the Card : &quot;+firstPlayerCard);</span>
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">            if (firstPlayerCard == null) {</span>
+                 // if this card is null, the player draw a card. 
+<span class="nc" id="L146">                System.out.println(&quot;\n&quot;);</span>
+<span class="nc" id="L147">                System.out.println(&quot;I draw and pass ! &quot;);   </span>
+            }
+            else{
+                
+<span class="fc" id="L151">                CardColor colorMaxHand = UnoGamePlayer.colorChooseInHand();</span>
+<span class="fc" id="L152">                effetOfTheCard(players, firstPlayerCard, colorMaxHand);</span>
+<span class="fc" id="L153">                Discard.getACardToDicard(firstPlayerCard);</span>
+            }
+        }
+<span class="fc" id="L156">        return null;</span>
+
+        //otherwise we do another round.
+    }
+
+    /**
+    * this method must be called when a winner is identified
+    * @param winner          the final winner of the same
+    * @param players         a Deque with all the players   
+    */
+    protected abstract void declareWinner(String winner, Deque&lt;String&gt; players);
+
+   /**
+    * Check the player still has a card or he has no more in his hand
+    * if the player still has a card, return false
+    * else return true. 
+    * @param cardProviderPlayer    the player that should give a card
+    * @return
+    */
+    protected abstract boolean getCardOrGameOver(String cardProviderPlayer);
+
+   /**
+    * give some card to a player
+    * @param player          the player that will receive the cards
+    * @param cardToGive      the cards as a collection of cards
+    */
+    protected abstract void giveCardToPlayers(String player, Collection&lt;Card&gt; cardToGive);
+
+     /**
+    * get a card from a player
+    * @param cardProviderPlayer    the player to give card
+    * @return                      the card from the player
+    */
+    protected abstract Card getCardToPlay(String cardProviderPlayer);
+
+     /**
+     * draw a card 
+     * @return the card the player draw 
+     */
+    protected  Card drawACard(){
+<span class="fc" id="L196">        return Deck.getACard();</span>
+    }
+
+    /**
+     * effect of each card special 
+     * @param players           a Deque with all the players   
+     * @param cardPlay          the card from the player will play
+     * @param colorMaxHand      the color often appears in hand of this player
+     */
+    public  void effetOfTheCard(Deque&lt;String&gt; players, Card cardPlay, CardColor colorMaxHand ){
+<span class="fc bfc" id="L206" title="All 6 branches covered.">        switch (cardPlay.getValue()) {</span>
+            case SKIPTURN:
+<span class="fc" id="L208">                effectSkipTurn(players);</span>
+<span class="fc" id="L209">                break;</span>
+            case INVERSE:
+<span class="fc" id="L211">                effectInverse(players);</span>
+<span class="fc" id="L212">                break;</span>
+            case PLUS2:
+<span class="fc" id="L214">                effectPlus(players,2);</span>
+<span class="fc" id="L215">                break;</span>
+            case JOKER:
+<span class="fc" id="L217">                effectJocker(cardPlay,colorMaxHand);</span>
+<span class="fc" id="L218">                break;</span>
+            case PLUS4:
+<span class="fc" id="L220">                effectJocker(cardPlay,colorMaxHand);</span>
+<span class="fc" id="L221">                effectPlus(players,4);</span>
+<span class="fc" id="L222">                break;</span>
+        
+            default:
+                break;
+        }
+<span class="fc" id="L227">    }</span>
+
+
+    /**
+     * effet of card SkipTurn
+     * @param players      a Deque with all the players  
+     */
+    public void effectSkipTurn(Deque&lt;String&gt; players) {
+<span class="fc" id="L235">        String secondPlayerInRound = players.poll();</span>
+<span class="fc" id="L236">        players.offerLast(secondPlayerInRound);</span>
+<span class="fc" id="L237">    }</span>
+
+    /**
+     * effet of card Inverser
+     * @param players      a Deque with all the players  
+     */
+    public void effectInverse(Deque&lt;String&gt; players){
+<span class="fc" id="L244">        sens=&quot;Inverse&quot;;</span>
+<span class="fc" id="L245">        String firstPlayerInRound = players.pollLast();</span>
+<span class="fc" id="L246">        players.offerFirst(firstPlayerInRound);</span>
+
+<span class="fc" id="L248">    }</span>
+
+    /**
+     * effet of card +2 and +4
+     * @param players       a Deque with all the players  
+     * @param length        the number of cards the next player will add
+     */
+    public void effectPlus(Deque&lt;String&gt; players,int length){
+<span class="fc" id="L256">        String secondPlayerInRound = players.poll();</span>
+<span class="fc" id="L257">        players.offer(secondPlayerInRound);</span>
+<span class="fc" id="L258">        Card[] PLUS = Deck.getCardsIni(length);</span>
+<span class="fc" id="L259">        String plus = Card.cardsToString(PLUS);</span>
+<span class="fc" id="L260">        giveCardsToPlayer(secondPlayerInRound, plus);</span>
+<span class="fc" id="L261">    }</span>
+
+     /**
+     * effet of card Joker
+     * @param cardPlay         the card to play 
+     * @param choosenColor     the color choose
+     */
+    public void effectJocker(Card cardPlay, CardColor choosenColor){
+<span class="fc" id="L269">        CardColor color = cardPlay.getColor();</span>
+<span class="pc bpc" id="L270" title="1 of 2 branches missed.">        if(color == CardColor.WHITE){</span>
+<span class="fc" id="L271">            cardPlay.setColor(choosenColor);</span>
+        }
+<span class="fc" id="L273">    }</span>
+    
+      /**
+     * get the sens of round 
+     * @param players        a Deque with all the players  
+     * @return           the player will play 
+     */
+    public String sensOfRound(Deque&lt;String&gt; players){
+<span class="fc bfc" id="L281" title="All 2 branches covered.">        switch (sens) {</span>
+            case &quot;Inverse&quot;:
+
+<span class="fc" id="L284">                String firstPlayerInRoundInvers = players.pollLast();</span>
+                //and put it immediately at the end
+<span class="fc" id="L286">                players.offerFirst(firstPlayerInRoundInvers);</span>
+<span class="fc" id="L287">                sens=&quot;sens&quot;;</span>
+<span class="fc" id="L288">                return firstPlayerInRoundInvers;</span>
+                
+            default:
+<span class="fc" id="L291">                String firstPlayerInRound = players.poll();</span>
+                //and put it immediately at the end
+<span class="fc" id="L293">                players.offer(firstPlayerInRound);</span>
+<span class="fc" id="L294">                return firstPlayerInRound;</span>
+            
+        }
+
+    }
+
+    /**
+     * we check the numbre of cards in deck and shuffle
+     */
+    public void reinitDeckFromDiscard(){
+        
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">        if(Deck.deck.size()&lt;=20){</span>
+<span class="fc" id="L306">            Card lastCardOnDiscard = Discard.getLastCardOnDisCard();</span>
+<span class="fc bfc" id="L307" title="All 2 branches covered.">            for(Card card : Discard.discard){</span>
+<span class="pc bpc" id="L308" title="1 of 4 branches missed.">                if (card.getValue()== CardValue.JOKER || card.getValue()== CardValue.PLUS4){</span>
+<span class="fc" id="L309">                    card.setColor(CardColor.WHITE);</span>
+<span class="fc" id="L310">                    Deck.deck.offerLast(card);</span>
+                }
+<span class="fc" id="L312">                Deck.deck.offerLast(card);</span>
+<span class="fc" id="L313">            }</span>
+<span class="fc" id="L314">            Discard.getACardToDicard(lastCardOnDiscard);</span>
+        
+<span class="fc" id="L316">            Collections.shuffle(Deck.deck);</span>
+<span class="fc" id="L317">            Collections.shuffle(Deck.deck);</span>
+<span class="fc" id="L318">            Collections.shuffle(Deck.deck);</span>
+<span class="fc" id="L319">            Collections.shuffle(Deck.deck); </span>
+<span class="fc" id="L320">            Collections.shuffle(Deck.deck);</span>
+        }
+
+<span class="fc" id="L323">    }</span>
+
+
+
+  
+   
+
+   
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

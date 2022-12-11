@@ -1,0 +1,12 @@
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/utils/ConsoleColors.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/LocalGameUno.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/UnoGameNetorkPlayer.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/exception/NoMoreCardException.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/game/Card.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/enums/CardValue.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/game/Deck.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/UnoGameEngine.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/UnoGameNetworkEngine.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/UnoGamePlayer.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/enums/CardColor.java
+/Users/olivialiu/Desktop/fin_local_L3_POO_V6/src/main/java/fr/pantheonsorbonne/miage/game/Discard.java

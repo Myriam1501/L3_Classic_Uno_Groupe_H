@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CardColor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">l3-poo-war</a> &gt; <a href="index.source.html" class="el_package">fr.pantheonsorbonne.miage.enums</a> &gt; <span class="el_source">CardColor.java</span></div><h1>CardColor.java</h1><pre class="source lang-java linenums">package fr.pantheonsorbonne.miage.enums;
+
+/**
+ * List the possible colors of a card
+ */
+<span class="fc" id="L6">public enum CardColor {</span>
+<span class="fc" id="L7">    BLEU(127137),</span>
+<span class="fc" id="L8">    RED(127137 + 16),</span>
+<span class="fc" id="L9">    YELLOW(127137 + 16 * 2),</span>
+<span class="fc" id="L10">    GREEN(127137 + 16 * 3),</span>
+<span class="fc" id="L11">    WHITE(127137 + 16 * 3);</span>
+
+    private final int code;
+
+<span class="fc" id="L15">    CardColor(int code) {</span>
+<span class="fc" id="L16">        this.code = code;</span>
+<span class="fc" id="L17">    }</span>
+    /**
+     * This function checks the existence of this color in the list of colors
+     * @param substring The color will be check
+     * @return the color you want
+     */
+    public static CardColor valueOfStr(String substring) {
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        for (CardColor color : CardColor.values()) {</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">            if (color.name().substring(0, 1).equals(substring)) {</span>
+<span class="fc" id="L26">                return color;</span>
+            }
+        }
+<span class="nc" id="L29">        throw new RuntimeException(&quot;No Such Color&quot;);</span>
+    }
+    /**
+     * This function is to return the first letter of the String type color
+     * @return the first letter of the color 
+     */
+    
+    public String getStringRepresentation() {
+<span class="fc" id="L37">        return &quot;&quot; + this.name().charAt(0);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

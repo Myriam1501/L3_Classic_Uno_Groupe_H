@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="fr"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LocalGameUno.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">l3-poo-war</a> &gt; <a href="index.source.html" class="el_package">fr.pantheonsorbonne.miage</a> &gt; <span class="el_source">LocalGameUno.java</span></div><h1>LocalGameUno.java</h1><pre class="source lang-java linenums">package fr.pantheonsorbonne.miage;
+
+import fr.pantheonsorbonne.miage.game.Card;
+import fr.pantheonsorbonne.miage.game.Deck;
+import fr.pantheonsorbonne.miage.game.Discard;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class LocalGameUno extends UnoGameEngine {
+
+    private final Set&lt;String&gt; initialPlayers;
+<span class="fc" id="L13">    protected final Map&lt;String, Queue&lt;Card&gt;&gt; playerCards = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L14">    protected final Map&lt;String, Integer&gt; playerScore = new HashMap&lt;&gt;();</span>
+
+<span class="fc" id="L16">    public LocalGameUno(Set&lt;String&gt; initialPlayers) {</span>
+<span class="fc" id="L17">        this.initialPlayers = initialPlayers;</span>
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        for (String player : initialPlayers) {</span>
+<span class="fc" id="L19">            playerCards.put(player, new LinkedList&lt;&gt;());</span>
+<span class="fc" id="L20">            playerScore.put(player, 0);</span>
+<span class="fc" id="L21">        }</span>
+<span class="fc" id="L22">    }</span>
+
+    public static void main(String... args) {
+<span class="nc" id="L25">        LocalGameUno localWarGame = new LocalGameUno(Set.of(&quot;Joueur1&quot;, &quot;Joueur2&quot;, &quot;Joueur3&quot;));</span>
+<span class="nc" id="L26">        localWarGame.play();</span>
+
+<span class="nc" id="L28">    }</span>
+
+    /**
+     * initialize players
+     */
+    @Override
+    protected Set&lt;String&gt; getInitialPlayers() {
+<span class="fc" id="L35">        return this.initialPlayers;</span>
+    }
+
+ 
+    /**
+     * Display the cards available in each player's hand
+     */
+    @Override
+    protected String playRound(Deque&lt;String&gt; players, Card LastCardOnDisCard) {
+<span class="fc" id="L44">        System.out.println(&quot;New round:&quot;);</span>
+<span class="fc" id="L45">        System.out.println(this.playerCards.keySet()</span>
+<span class="fc" id="L46">                                .stream()</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">                                .filter(p -&gt; !this.playerCards.get(p).isEmpty())</span>
+<span class="fc" id="L48">                                .map(p -&gt; p + &quot; has &quot; + this.playerCards</span>
+<span class="fc" id="L49">                                                            .get(p)</span>
+<span class="fc" id="L50">                                                            .stream()</span>
+<span class="fc" id="L51">                                                            .map(c -&gt; c.toString())</span>
+<span class="fc" id="L52">                                                            .collect(Collectors.joining(&quot; ; &quot;)))</span>
+<span class="fc" id="L53">                                .collect(Collectors.joining(&quot;\n&quot;)));</span>
+<span class="fc" id="L54">        System.out.println();</span>
+<span class="fc" id="L55">        return super.playRound(players,LastCardOnDisCard);</span>
+
+    }
+    /**
+     * calculate the sum of score of the cards in hand of two losers
+     * give these score to winner
+     */
+    @Override
+    protected void giveScoreToPlayer(String winner) {
+<span class="fc" id="L64">        int pointsWinningOfTheRound =0;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        for (Map.Entry mapentry : playerCards.entrySet()) {     </span>
+<span class="fc" id="L66">            Queue&lt;Card&gt; value = (Queue&lt;Card&gt;) mapentry.getValue();</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">            for(Card card : value){</span>
+<span class="fc" id="L68">                pointsWinningOfTheRound += card.getValue().getRank();</span>
+
+<span class="fc" id="L70">            }  </span>
+<span class="fc" id="L71">        }</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        if (playerScore.containsKey(winner)){</span>
+<span class="fc" id="L73">            int scoreOld = playerScore.get(winner);</span>
+<span class="fc" id="L74">            playerScore.replace(winner, (int)playerScore.get(winner), scoreOld+pointsWinningOfTheRound);</span>
+<span class="fc" id="L75">            System.out.println(winner +&quot; won, He have &quot;+playerScore.get(winner)+&quot; now !\n&quot;);</span>
+        }
+        
+<span class="fc" id="L78">    }</span>
+    /**
+     * We check the score of each player, if the score is more than 50 points, this player wins.
+     * we return true, else we return false.
+     */
+    @Override
+    protected boolean checkScoreToWin() {
+        
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        for (Map.Entry scoreplayer : playerScore.entrySet()) {  </span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">            if ((int)scoreplayer.getValue()&gt;=50){</span>
+<span class="fc" id="L88">                System.out.println(&quot;\n\nscore of the winner is : &quot; +scoreplayer+&quot;\n&quot;);</span>
+<span class="fc" id="L89">                return true;</span>
+            }
+<span class="fc" id="L91">        }</span>
+<span class="fc" id="L92">        return false;</span>
+        
+    }
+
+    /**
+     * We delete all players and declare the winner
+     */
+    @Override
+    protected void declareWinner(String winner, Deque&lt;String&gt; players) {
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        for (int index = 0; index &lt; players.size(); index++) {</span>
+<span class="fc" id="L102">            String player = players.poll();</span>
+            
+        }
+<span class="fc" id="L105">        System.out.println(winner + &quot; has won!&quot;);</span>
+<span class="fc" id="L106">    }</span>
+    
+    /**
+     * Check the player still has a card or he has no more in his hand
+     * if the player still has a card, return false
+     * else return true. 
+     */
+    @Override
+    protected boolean getCardOrGameOver(String cardProviderPlayer) {
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">        if (!this.playerCards.containsKey(cardProviderPlayer) || this.playerCards.get(cardProviderPlayer).isEmpty()) {</span>
+<span class="fc" id="L116">            return true;</span>
+        } 
+<span class="fc" id="L118">        return false; </span>
+
+           
+    }
+
+      /**
+     * By using the playThisCard function in the UnoGamePlayer class to retrieve a best choice playable 
+     * card with the strategies.
+     * if this card is not null, retrun this card
+     * otherwise the player draws a card from the deck and rechecks this card, 
+     * if this drawn card is not yet playable, we return null.
+     */
+    @Override
+    protected Card getCardToPlay(String cardProviderPlayer) {
+<span class="fc" id="L132">        Card lastCardTalon = Discard.getLastCardOnDisCard();</span>
+<span class="fc" id="L133">        Card cardplay = UnoGamePlayer.playThisCard((LinkedList&lt;Card&gt;) this.playerCards.get(cardProviderPlayer),lastCardTalon);</span>
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">            if(cardplay!= null){</span>
+<span class="fc" id="L135">                return cardplay;</span>
+            }
+            else{
+<span class="nc" id="L138">                Card drowenCard = Deck.getACard();</span>
+<span class="nc" id="L139">                Card drawenCardToPlay = UnoGamePlayer.playThisCard(UnoGamePlayer.playTheDrawenCard(drowenCard),lastCardTalon);</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">                if(drawenCardToPlay!=null){</span>
+<span class="nc" id="L141">                    System.out.println(&quot;Good pick ! &quot;);</span>
+<span class="nc" id="L142">                    return drawenCardToPlay;</span>
+                }
+                else{
+<span class="nc" id="L145">                    System.out.println(&quot;Bad pick ! &quot;);</span>
+<span class="nc" id="L146">                    this.playerCards.get(cardProviderPlayer).add(drowenCard);</span>
+                }
+                
+
+            }
+<span class="nc" id="L151">            return null;</span>
+        
+    }
+
+    /**
+     * Give cards to Players
+     */
+    @Override
+    protected void giveCardsToPlayer(String playerName, String hand) {
+<span class="fc" id="L160">        System.out.println(&quot;hand : &quot;+hand);</span>
+<span class="fc" id="L161">        Collection&lt;Card&gt; cards = Arrays.asList(Card.stringToCards(hand));</span>
+<span class="fc" id="L162">        this.playerCards.get(playerName).addAll(cards);</span>
+<span class="fc" id="L163">    }</span>
+
+     /**
+     * Give cards to Players
+     */
+    @Override
+    protected void giveCardToPlayers(String player,Collection&lt;Card&gt; cardToGive){
+<span class="fc" id="L170">        System.out.println(player + &quot; : card To Give : &quot;+cardToGive);</span>
+<span class="fc" id="L171">        List&lt;Card&gt; cards = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L172">        cards.addAll(cardToGive);</span>
+<span class="fc" id="L173">        Collections.shuffle(cards);</span>
+<span class="fc" id="L174">        this.playerCards.get(player).removeAll(this.playerCards.get(player));</span>
+<span class="fc" id="L175">        this.playerCards.get(player).addAll(cards);</span>
+<span class="fc" id="L176">    }</span>
+    
+
+    
+
+   
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
