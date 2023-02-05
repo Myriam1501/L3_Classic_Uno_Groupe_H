@@ -19,7 +19,7 @@ import java.util.Set;
 public abstract class UnoGameEngine {
 
     public static final int CARDS_IN_HAND_INITIAL_COUNT = 7;
-    public static String sens = "sens";
+    public static String sens = "sens"; //should be boolean or at least enum, not string
     /**
      * play a Uno game wit the provided players
      */
@@ -30,7 +30,7 @@ public abstract class UnoGameEngine {
         final Deque<String> players = new LinkedList<>();
         players.addAll(this.getInitialPlayers());
         //repeat until only 1 player has over 50 points
-        while(checkScoreToWin()==false){
+        while(!hasWon()){
             int i=0;
             // The card can not initialize by card special. 
             Card cardToInitDiscard = pickACardFromDiscardToDebut();
@@ -130,7 +130,7 @@ public abstract class UnoGameEngine {
      * we return true, else we return false.
      * @return
      */
-    protected abstract boolean checkScoreToWin();
+    protected abstract boolean hasWon(); //better name
     
     /**
      * Play a single round
@@ -144,7 +144,7 @@ public abstract class UnoGameEngine {
         System.out.println("Player Playing : "+firstPlayerInRound);
         
         //here, we try to get the first player card
-        if(getCardOrGameOver(firstPlayerInRound)){
+        if(hasAtLeastACard(firstPlayerInRound)){
             String winnerOfTheRound = firstPlayerInRound;
             players.remove(winnerOfTheRound);
             return winnerOfTheRound;
@@ -167,7 +167,7 @@ public abstract class UnoGameEngine {
                 Discard.getACardToDicard(firstPlayerCard);
             }
         }
-        return null;
+        return null; // exception needed
 
         //otherwise we do another round.
     }
@@ -186,7 +186,7 @@ public abstract class UnoGameEngine {
     * @param cardProviderPlayer    the player that should give a card
     * @return
     */
-    protected abstract boolean getCardOrGameOver(String cardProviderPlayer);
+    protected abstract boolean hasAtLeastACard(String cardProviderPlayer);
 
    /**
     * give some card to a player
@@ -292,7 +292,7 @@ public abstract class UnoGameEngine {
      * @return           the player will play 
      */
     public String sensOfRound(Deque<String> players){
-        switch (sens) {
+        switch (sens) { //not really the best option for a boolean outcome
             case "Inverse":
 
                 String firstPlayerInRoundInvers = players.pollLast();

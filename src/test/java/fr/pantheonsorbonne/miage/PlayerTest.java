@@ -79,7 +79,7 @@ public class PlayerTest {
        getCardYouCanPlay.add(c2);
        getCardYouCanPlay.add(c3);
 
-       assertFalse(unoGamePlayer.containSpecialCard(getCardYouCanPlay));
+       assertFalse(unoGamePlayer.doesContainSpecialCard(getCardYouCanPlay));
     }
     @Test
     public void testingContainSpecialCard2()  {
@@ -91,7 +91,7 @@ public class PlayerTest {
        getCardYouCanPlay.add(c2);
        getCardYouCanPlay.add(c3);
 
-       assertTrue(unoGamePlayer.containSpecialCard(getCardYouCanPlay));
+       assertTrue(unoGamePlayer.doesContainSpecialCard(getCardYouCanPlay));
     }
     @Test
     public void testingplayThisSpecialCard()  {

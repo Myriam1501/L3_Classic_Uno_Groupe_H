@@ -1,11 +1,6 @@
 package fr.pantheonsorbonne.miage;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import fr.pantheonsorbonne.miage.enums.CardColor;
 import fr.pantheonsorbonne.miage.enums.CardValue;
@@ -15,7 +10,7 @@ import fr.pantheonsorbonne.miage.game.Card;
 public class UnoGamePlayer {
     static final String playerId = "Player-" + new Random().nextInt();
     static int score = 0;
-    static LinkedList<Card> hand = new LinkedList<>();
+    static List<Card> hand = new LinkedList<Card>();
     static boolean UNO = false;
 
      /**
@@ -40,7 +35,7 @@ public class UnoGamePlayer {
      * @param lastCardTalon    last card in the discard 
      * @return                return a array list card but if this list is null return null. 
      */
-    protected static LinkedList<Card> getCardYouCanPlay(LinkedList<Card> hand, Card lastCardTalon)
+    protected static List<Card> getCardYouCanPlay(List<Card> hand, Card lastCardTalon)
     {
         LinkedList<Card> getCardYouCanPlay = new LinkedList<>();
         for (int i = 0; i < hand.size(); i++) {
@@ -60,7 +55,7 @@ public class UnoGamePlayer {
      * @param drawACard       the card he draws
      * @return                all cards in hand
      */
-    protected static LinkedList<Card> playTheDrawenCard(Card drawACard){
+    protected static List<Card> playTheDrawenCard(Card drawACard){
             
             hand.add(drawACard);
             return hand;
@@ -73,9 +68,9 @@ public class UnoGamePlayer {
      * @param lastCardTalon    last card in the discard 
      * @return                 theCardToPlay or null 
      */
-    protected static Card playThisCard(LinkedList<Card> hand,Card lastCardTalon){
+    protected static Card playThisCard(List<Card> hand,Card lastCardTalon){
     
-        LinkedList<Card> cardYouCanPlay = getCardYouCanPlay(hand, lastCardTalon);
+        List<Card> cardYouCanPlay = getCardYouCanPlay(hand, lastCardTalon);
         if(cardYouCanPlay!=null){
             Card theCardToPlay;
             if(cardYouCanPlay.size()==1){
@@ -84,7 +79,7 @@ public class UnoGamePlayer {
                 return theCardToPlay;
             }
             else{
-                if(containSpecialCard(cardYouCanPlay)==true){
+                if(doesContainSpecialCard(cardYouCanPlay)){
                     theCardToPlay = playThisSpecialCard(cardYouCanPlay);
                     giveToDiscard(hand, theCardToPlay);
                     return theCardToPlay;
@@ -97,6 +92,7 @@ public class UnoGamePlayer {
             }
         }
         else{
+            //gestion par exception requise
             return null;
         }
     }
@@ -105,7 +101,7 @@ public class UnoGamePlayer {
      * @param getCardYouCanPlay    a array list with all playable card
      * @return                     return the special card or return null 
      */
-    protected static Card playThisSpecialCard(LinkedList<Card> getCardYouCanPlay){
+    protected static Card playThisSpecialCard(List<Card> getCardYouCanPlay){
         CardValue[] orderlist ={CardValue.JOKER, CardValue.PLUS4,CardValue.SKIPTURN,CardValue.INVERSE,CardValue.PLUS2};
             for (CardValue order : orderlist) {
                 for (Card i : getCardYouCanPlay) {
@@ -115,7 +111,7 @@ public class UnoGamePlayer {
                     }
                 }
             }
-            return null;
+            return null; //gestion des exceptions requise
 
     }
 
@@ -124,7 +120,7 @@ public class UnoGamePlayer {
      * @param getCardYouCanPlay     a array list with all playable card
      * @return                      if it contains return true else return false.
      */
-    protected static boolean containSpecialCard(List<Card> getCardYouCanPlay){
+    protected static boolean doesContainSpecialCard(List<Card> getCardYouCanPlay){
         for (Card i : getCardYouCanPlay) {
             if( i.getValue().getRank()>=20){
                 return true;
@@ -154,12 +150,12 @@ public class UnoGamePlayer {
      * @param hand           all cards in hand
      * @param cardPlayed     
      */
-    protected static void giveToDiscard(LinkedList<Card> hand, Card cardPlayed){
+    protected static void giveToDiscard(List<Card> hand, Card cardPlayed){
         hand.remove(cardPlayed);
         if (hand.size()==1) {
             UNO = true;
             System.out.println("uno !");
-        }
+        }//you don't handle the uno keyword other that with the standard output?
         
     }
     
@@ -210,6 +206,6 @@ public class UnoGamePlayer {
             }
         }
         
-        return null;
+        return null; //gestion par exception requise
     }
 }

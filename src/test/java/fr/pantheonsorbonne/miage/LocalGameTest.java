@@ -54,7 +54,7 @@ public class LocalGameTest {
     @Test
     public void testingCheckScoreToWin()  {
         localWarGame.playerScore.put("Joueur1", 10);
-        assertFalse(localWarGame.checkScoreToWin());
+        assertFalse(localWarGame.hasWon());
     }
     @Test
     public void testingCheckScoreToWin2()  {
@@ -67,7 +67,7 @@ public class LocalGameTest {
     public void testingCheckScoreToWin1()  {
         localWarGame.playerScore.put("Joueur1", 80);
         localWarGame.playerScore.put("Joueur3", 10);
-        assertTrue(localWarGame.checkScoreToWin());
+        assertTrue(localWarGame.hasWon());
     }
     @Test
     public void testingCheckScoreToWin3()  {
@@ -76,7 +76,7 @@ public class LocalGameTest {
     @Test
     public void testingGetCardOrGameOver()  {
         System.out.println(localWarGame.playerCards);
-        assertTrue(localWarGame.getCardOrGameOver("Joueur1"));
+        assertTrue(localWarGame.hasAtLeastACard("Joueur1"));
     }
     @Test
     public void testingGetCardOrGameOver1() {
@@ -85,7 +85,7 @@ public class LocalGameTest {
         String hand = "PLUS4_W;6_B";
         localWarGame.giveCardsToPlayer(player,hand);
         System.out.println(localWarGame.playerCards);
-        assertFalse(localWarGame.getCardOrGameOver("Joueur1"));
+        assertFalse(localWarGame.hasAtLeastACard("Joueur1"));
     }
     @Test
     public void testingGetCardToPlay()  {

@@ -22,7 +22,7 @@ public class LocalGameUno extends UnoGameEngine {
     }
 
     public static void main(String... args) {
-        LocalGameUno localWarGame = new LocalGameUno(Set.of("Joueur1", "Joueur2", "Joueur3"));
+        LocalGameUno localWarGame = new LocalGameUno(Set.of("Joueur1", "Joueur2", "Joueur3","Joueur4"));
         localWarGame.play();
 
     }
@@ -80,7 +80,7 @@ public class LocalGameUno extends UnoGameEngine {
      * we return true, else we return false.
      */
     @Override
-    protected boolean checkScoreToWin() {
+    protected boolean hasWon() {
         
         for (Map.Entry scoreplayer : playerScore.entrySet()) {  
             if ((int)scoreplayer.getValue()>=50){
@@ -110,7 +110,7 @@ public class LocalGameUno extends UnoGameEngine {
      * else return true. 
      */
     @Override
-    protected boolean getCardOrGameOver(String cardProviderPlayer) {
+    protected boolean hasAtLeastACard(String cardProviderPlayer) {
         if (!this.playerCards.containsKey(cardProviderPlayer) || this.playerCards.get(cardProviderPlayer).isEmpty()) {
             return true;
         } 

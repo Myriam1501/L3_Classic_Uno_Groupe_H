@@ -87,7 +87,7 @@ public class UnoGameNetworkEngine extends UnoGameEngine {
     * @return
     */
     @Override
-    protected boolean getCardOrGameOver(String cardProviderPlayer) {
+    protected boolean hasAtLeastACard(String cardProviderPlayer) {
         hostFacade.sendGameCommandToPlayer(uno, cardProviderPlayer, new GameCommand("doYouHaveCards"));
         GameCommand expectedCard = hostFacade.receiveGameCommand(uno);
         if(expectedCard.name().equals("outOfCard")) {
@@ -160,7 +160,7 @@ public class UnoGameNetworkEngine extends UnoGameEngine {
             if(!player.equals(winner)){
                hostFacade.sendGameCommandToPlayer(uno, player, new GameCommand("yourLostHandScore"));
                 GameCommand expectedScore = hostFacade.receiveGameCommand(uno);
-                if (!getCardOrGameOver(player)) {
+                if (!hasAtLeastACard(player)) {
                     try{
                         pointsWinningOfTheRound+= Integer.parseInt(expectedScore.body());
                     }
@@ -182,7 +182,7 @@ public class UnoGameNetworkEngine extends UnoGameEngine {
      * @return
      */
     @Override 
-    protected boolean checkScoreToWin() {
+    protected boolean hasWon() {
         for (String player : players) {
             hostFacade.sendGameCommandToPlayer(uno, player, new GameCommand("whatIsYourScore"));
             GameCommand expectedCard = hostFacade.receiveGameCommand(uno);
